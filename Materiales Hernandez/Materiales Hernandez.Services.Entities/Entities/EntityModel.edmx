@@ -13,7 +13,155 @@
     <edmx:ConceptualModels>
       <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="EntityModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
         <EntityContainer Name="EntityModelContainer" annotation:LazyLoadingEnabled="true">
-        </EntityContainer>
+          <EntitySet Name="Clientes" EntityType="EntityModel.Cliente" />
+          <EntitySet Name="Empleados" EntityType="EntityModel.Empleado" />
+          <EntitySet Name="Inventarios" EntityType="EntityModel.Inventario" />
+          <AssociationSet Name="ClienteFactura" Association="EntityModel.ClienteFactura">
+            <End Role="Cliente" EntitySet="Clientes" />
+            <End Role="Factura" EntitySet="Inventarios" />
+          </AssociationSet>
+          <AssociationSet Name="CajeroFactura" Association="EntityModel.CajeroFactura">
+            <End Role="Cajero" EntitySet="Empleados" />
+            <End Role="Factura" EntitySet="Inventarios" />
+          </AssociationSet>
+          <AssociationSet Name="ProovedorFactura" Association="EntityModel.ProovedorFactura">
+            <End Role="Proovedor" EntitySet="Inventarios" />
+            <End Role="Factura" EntitySet="Inventarios" />
+          </AssociationSet>
+          <AssociationSet Name="ProovedorPedido" Association="EntityModel.ProovedorPedido">
+            <End Role="Proovedor" EntitySet="Inventarios" />
+            <End Role="Pedido" EntitySet="Inventarios" />
+          </AssociationSet>
+          <AssociationSet Name="EmpleadoPedido" Association="EntityModel.EmpleadoPedido">
+            <End Role="Empleado" EntitySet="Empleados" />
+            <End Role="Pedido" EntitySet="Inventarios" />
+          </AssociationSet>
+          <AssociationSet Name="SocioPedido" Association="EntityModel.SocioPedido">
+            <End Role="Socio" EntitySet="Inventarios" />
+            <End Role="Pedido" EntitySet="Inventarios" />
+          </AssociationSet>
+          <AssociationSet Name="SocioFactura" Association="EntityModel.SocioFactura">
+            <End Role="Socio" EntitySet="Inventarios" />
+            <End Role="Factura" EntitySet="Inventarios" />
+          </AssociationSet>
+          <AssociationSet Name="ClienteCotizar_Material" Association="EntityModel.ClienteCotizar_Material">
+            <End Role="Cliente" EntitySet="Clientes" />
+            <End Role="Cotizar_Material" EntitySet="Inventarios" />
+          </AssociationSet>
+          <AssociationSet Name="CajeroCotizar_Material" Association="EntityModel.CajeroCotizar_Material">
+            <End Role="Cajero" EntitySet="Empleados" />
+            <End Role="Cotizar_Material" EntitySet="Inventarios" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="Cliente">
+          <Key>
+            <PropertyRef Name="IdClienteCedula" />
+          </Key>
+          <Property Name="IdClienteCedula" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" Nullable="false" FixedLength="true" MaxLength="Max" />
+          <Property Name="Direccion" Type="String" Nullable="false" />
+          <Property Name="Ciudad" Type="String" Nullable="false" />
+          <Property Name="Telefono" Type="Int32" Nullable="false" />
+          <Property Name="Correo_Electronico" Type="String" Nullable="false" />
+          <NavigationProperty Name="Facturas" Relationship="EntityModel.ClienteFactura" FromRole="Cliente" ToRole="Factura" />
+          <NavigationProperty Name="Cotizar_Material" Relationship="EntityModel.ClienteCotizar_Material" FromRole="Cliente" ToRole="Cotizar_Material" />
+        </EntityType>
+        <EntityType Name="Empleado">
+          <Key>
+            <PropertyRef Name="IdEmpleado" />
+          </Key>
+          <Property Name="IdEmpleado" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" Nullable="false" />
+          <NavigationProperty Name="Pedidoes" Relationship="EntityModel.EmpleadoPedido" FromRole="Empleado" ToRole="Pedido" />
+        </EntityType>
+        <EntityType Name="Cajero" BaseType="EntityModel.Empleado" >
+          <Property Name="Fecha_Venta" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="Facturas" Relationship="EntityModel.CajeroFactura" FromRole="Cajero" ToRole="Factura" />
+          <NavigationProperty Name="Cotizar_Material" Relationship="EntityModel.CajeroCotizar_Material" FromRole="Cajero" ToRole="Cotizar_Material" />
+        </EntityType>
+        <EntityType Name="Gerente" BaseType="EntityModel.Empleado" >
+          <Property Name="Nit_Gerente" Type="Int32" Nullable="false" />
+          <Property Name="Telefono" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Inventario">
+          <Key>
+            <PropertyRef Name="IdInventario" />
+          </Key>
+          <Property Name="IdInventario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Cantidad" Type="String" Nullable="false" />
+          <Property Name="Descripción" Type="String" Nullable="false" />
+          <Property Name="Valor_Unitario" Type="String" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Factura" BaseType="EntityModel.Inventario" >
+          <Property Name="Valor_Total" Type="Int32" Nullable="false" />
+          <Property Name="Fecha" Type="DateTime" Nullable="false" />
+          <Property Name="IdFactura" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Metodo_Pago" Type="String" Nullable="false" />
+          <NavigationProperty Name="Cliente" Relationship="EntityModel.ClienteFactura" FromRole="Factura" ToRole="Cliente" />
+          <NavigationProperty Name="Cajero" Relationship="EntityModel.CajeroFactura" FromRole="Factura" ToRole="Cajero" />
+          <NavigationProperty Name="Proovedor1" Relationship="EntityModel.ProovedorFactura" FromRole="Factura" ToRole="Proovedor" />
+          <NavigationProperty Name="Socio1" Relationship="EntityModel.SocioFactura" FromRole="Factura" ToRole="Socio" />
+        </EntityType>
+        <EntityType Name="Proovedor" BaseType="EntityModel.Factura" >
+          <Property Name="NitProovedor" Type="String" Nullable="false" />
+          <Property Name="Fecha_Envio" Type="String" Nullable="false" />
+          <NavigationProperty Name="Facturas" Relationship="EntityModel.ProovedorFactura" FromRole="Proovedor" ToRole="Factura" />
+          <NavigationProperty Name="Pedidoes" Relationship="EntityModel.ProovedorPedido" FromRole="Proovedor" ToRole="Pedido" />
+        </EntityType>
+        <EntityType Name="Socio" BaseType="EntityModel.Factura" >
+          <Property Name="Nit_Socio" Type="String" Nullable="false" />
+          <Property Name="Fecha_Envio" Type="String" Nullable="false" />
+          <NavigationProperty Name="Pedidoes" Relationship="EntityModel.SocioPedido" FromRole="Socio" ToRole="Pedido" />
+          <NavigationProperty Name="Facturas" Relationship="EntityModel.SocioFactura" FromRole="Socio" ToRole="Factura" />
+        </EntityType>
+        <EntityType Name="Pedido" BaseType="EntityModel.Factura" >
+          <Property Name="Fecha_Entrega" Type="DateTime" Nullable="false" />
+          <Property Name="IdClienteCedula" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Proovedor" Relationship="EntityModel.ProovedorPedido" FromRole="Pedido" ToRole="Proovedor" />
+          <NavigationProperty Name="Empleado" Relationship="EntityModel.EmpleadoPedido" FromRole="Pedido" ToRole="Empleado" />
+          <NavigationProperty Name="Socio" Relationship="EntityModel.SocioPedido" FromRole="Pedido" ToRole="Socio" />
+        </EntityType>
+        <EntityType Name="Cotizar_Material" BaseType="EntityModel.Factura" >
+          <Property Name="Solicita" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Cliente1" Relationship="EntityModel.ClienteCotizar_Material" FromRole="Cotizar_Material" ToRole="Cliente" />
+          <NavigationProperty Name="Cajero1" Relationship="EntityModel.CajeroCotizar_Material" FromRole="Cotizar_Material" ToRole="Cajero" />
+        </EntityType>
+        <Association Name="ClienteFactura">
+          <End Type="EntityModel.Cliente" Role="Cliente" Multiplicity="*" />
+          <End Type="EntityModel.Factura" Role="Factura" Multiplicity="1" />
+        </Association>
+        <Association Name="CajeroFactura">
+          <End Type="EntityModel.Cajero" Role="Cajero" Multiplicity="1" />
+          <End Type="EntityModel.Factura" Role="Factura" Multiplicity="*" />
+        </Association>
+        <Association Name="ProovedorFactura">
+          <End Type="EntityModel.Proovedor" Role="Proovedor" Multiplicity="1" />
+          <End Type="EntityModel.Factura" Role="Factura" Multiplicity="1" />
+        </Association>
+        <Association Name="ProovedorPedido">
+          <End Type="EntityModel.Proovedor" Role="Proovedor" Multiplicity="1" />
+          <End Type="EntityModel.Pedido" Role="Pedido" Multiplicity="1" />
+        </Association>
+        <Association Name="EmpleadoPedido">
+          <End Type="EntityModel.Empleado" Role="Empleado" Multiplicity="1" />
+          <End Type="EntityModel.Pedido" Role="Pedido" Multiplicity="*" />
+        </Association>
+        <Association Name="SocioPedido">
+          <End Type="EntityModel.Socio" Role="Socio" Multiplicity="1" />
+          <End Type="EntityModel.Pedido" Role="Pedido" Multiplicity="1" />
+        </Association>
+        <Association Name="SocioFactura">
+          <End Type="EntityModel.Socio" Role="Socio" Multiplicity="1" />
+          <End Type="EntityModel.Factura" Role="Factura" Multiplicity="1" />
+        </Association>
+        <Association Name="ClienteCotizar_Material">
+          <End Type="EntityModel.Cliente" Role="Cliente" Multiplicity="1" />
+          <End Type="EntityModel.Cotizar_Material" Role="Cotizar_Material" Multiplicity="1" />
+        </Association>
+        <Association Name="CajeroCotizar_Material">
+          <End Type="EntityModel.Cajero" Role="Cajero" Multiplicity="1" />
+          <End Type="EntityModel.Cotizar_Material" Role="Cotizar_Material" Multiplicity="*" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -44,6 +192,36 @@
     </edmx:Options>
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
+      <Diagram DiagramId="b5901847d9a54707a5b2ff359712692b" Name="Diagram1" ZoomLevel="64" >
+        <EntityTypeShape EntityType="EntityModel.Cliente" Width="2" PointX="18.25" PointY="0.5" />
+        <EntityTypeShape EntityType="EntityModel.Empleado" Width="1.5" PointX="8" PointY="9.125" />
+        <EntityTypeShape EntityType="EntityModel.Cajero" Width="1.5" PointX="12" PointY="3" />
+        <InheritanceConnector EntityType="EntityModel.Cajero" />
+        <EntityTypeShape EntityType="EntityModel.Gerente" Width="1.5" PointX="13.375" PointY="9" />
+        <InheritanceConnector EntityType="EntityModel.Gerente" />
+        <EntityTypeShape EntityType="EntityModel.Inventario" Width="1.5" PointX="21" PointY="2.5" />
+        <EntityTypeShape EntityType="EntityModel.Factura" Width="1.5" PointX="15.125" PointY="1" IsExpanded="true" />
+        <InheritanceConnector EntityType="EntityModel.Factura" />
+        <EntityTypeShape EntityType="EntityModel.Proovedor" Width="1.5" PointX="9.625" PointY="5.375" />
+        <InheritanceConnector EntityType="EntityModel.Proovedor" />
+        <EntityTypeShape EntityType="EntityModel.Socio" Width="1.5" PointX="16.5" PointY="6.875" />
+        <InheritanceConnector EntityType="EntityModel.Socio" ManuallyRouted="false" >
+        </InheritanceConnector>
+        <EntityTypeShape EntityType="EntityModel.Pedido" Width="1.5" PointX="12.125" PointY="5.5" IsExpanded="true" />
+        <InheritanceConnector EntityType="EntityModel.Pedido" />
+        <EntityTypeShape EntityType="EntityModel.Cotizar_Material" Width="1.5" PointX="19.625" PointY="6.375" />
+        <InheritanceConnector EntityType="EntityModel.Cotizar_Material" ManuallyRouted="false" >
+        </InheritanceConnector>
+        <AssociationConnector Association="EntityModel.ClienteFactura" />
+        <AssociationConnector Association="EntityModel.CajeroFactura" />
+        <AssociationConnector Association="EntityModel.ProovedorFactura" />
+        <AssociationConnector Association="EntityModel.ProovedorPedido" />
+        <AssociationConnector Association="EntityModel.EmpleadoPedido" />
+        <AssociationConnector Association="EntityModel.SocioPedido" />
+        <AssociationConnector Association="EntityModel.SocioFactura" />
+        <AssociationConnector Association="EntityModel.ClienteCotizar_Material" />
+        <AssociationConnector Association="EntityModel.CajeroCotizar_Material" />
+      </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>
